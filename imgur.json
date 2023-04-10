@@ -1,5 +1,5 @@
 {
-    "name": "Imgur API",
+    "name": "Imgur",
     "files": {
         "lua/packages/imgur/package.lua": "",
         "lua/packages/imgur/init.lua": ""
