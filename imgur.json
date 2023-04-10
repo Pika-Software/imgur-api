@@ -1,0 +1,7 @@
+{
+    "name": "Imgur API",
+    "files": {
+        "lua/packages/imgur/package.lua": "",
+        "lua/packages/imgur/init.lua": ""
+    }
+}
