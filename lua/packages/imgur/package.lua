@@ -1,3 +1,3 @@
 name = "Imgur"
 main = "init.lua"
-version = 2
+version = 3

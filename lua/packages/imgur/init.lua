@@ -12,7 +12,7 @@ local http = http
 local util = util
 
 -- Variables
-local imgurID = CreateConVar( "imgur_clientid", "", FCVAR_ARCHIVE, " - https://api.imgur.com/oauth2/addclient" )
+local imgurID = CreateConVar( "imgur_clientid", "", bit.bor( FCVAR_ARCHIVE, FCVAR_PROTECTED ), " - https://api.imgur.com/oauth2/addclient" )
 local assert = assert
 local type = type
 
