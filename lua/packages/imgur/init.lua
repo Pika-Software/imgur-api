@@ -45,7 +45,6 @@ Upload = promise.Async( function( binaryData, contentType, title, description, n
     local clientID = imgurID:GetString()
     assert( clientID ~= "", "no clientID" )
 
-    imageID = string.match( imageID, "^https?://imgur%.com[/\\](%w+)[%./\\]?" ) or imageID
     if string.IsURL( binaryData ) then contentType = "URL" end
 
     local parameters = {
