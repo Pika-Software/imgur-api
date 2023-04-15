@@ -1,8 +1,8 @@
 -- HTTP Content
-if file.Exists( "packages/http_content/package.lua", "LUA" ) then
-    import "packages/http_content"
+if file.Exists( "packages/http-content/package.lua", "LUA" ) then
+    import "packages/http-content"
 else
-    import "https://raw.githubusercontent.com/Pika-Software/http_content_package/master/http_content.json"
+    import "https://raw.githubusercontent.com/Pika-Software/http_content_package/master/http-content.json"
 end
 
 -- Libraries
