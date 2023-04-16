@@ -1,7 +1,7 @@
 {
     "name": "imgur-api",
     "files": {
-        "lua/packages/imgur-api/package.lua": "",
-        "lua/packages/imgur-api/init.lua": ""
+        "lua/packages/imgur-api/package.lua": "https://raw.githubusercontent.com/Pika-Software/imgur-api/master/lua/packages/imgur-api/package.lua",
+        "lua/packages/imgur-api/init.lua": "https://raw.githubusercontent.com/Pika-Software/imgur-api/master/lua/packages/imgur-api/init.lua"
     }
 }
