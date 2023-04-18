@@ -1,5 +1,5 @@
 -- HTTP Content
-import( Either( file.Exists( "packages/http-content/package.lua", "LUA" ), "packages/http-content", "https://raw.githubusercontent.com/Pika-Software/http-content/master/package.json" ) )
+import( file.Exists( "packages/http-content/package.lua", "LUA" ) and "packages/http-content" or "https://raw.githubusercontent.com/Pika-Software/http-content/master/package.json" )
 
 -- Libraries
 local promise = promise

@@ -1,3 +1,3 @@
 name = "imgur-api"
 main = "init.lua"
-version = 4
+version = 5
