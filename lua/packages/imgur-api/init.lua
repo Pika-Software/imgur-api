@@ -1,4 +1,4 @@
-import( gpm.LuaPackageExists( "packages/http-content" ) and "packages/http-content" or "https://raw.githubusercontent.com/Pika-Software/http-content/master/package.json" )
+import( gpm.PackageExists( "packages/http-content" ) and "packages/http-content" or "https://raw.githubusercontent.com/Pika-Software/http-content/master/package.json" )
 
 -- Libraries
 local promise = promise
