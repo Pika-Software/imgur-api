@@ -1,4 +1,4 @@
-import( gpm.PackageExists( "packages/http-content" ) and "packages/http-content" or "https://github.com/Pika-Software/http-content" )
+require( "packages/http-content", "https://github.com/Pika-Software/http-content" )
 
 -- Libraries
 local promise = promise
