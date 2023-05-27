@@ -1,4 +1,4 @@
-require( "packages/http-content", "https://github.com/Pika-Software/http-content" )
+install( "packages/http-content", "https://github.com/Pika-Software/http-content" )
 
 -- Libraries
 local promise = promise
