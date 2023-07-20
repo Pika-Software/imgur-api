@@ -1,2 +1,2 @@
 name = "imgur-api"
-version = 010000
+version = "1.1.0"

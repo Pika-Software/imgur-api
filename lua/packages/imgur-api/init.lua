@@ -3,28 +3,54 @@ install( "packages/http-content", "https://github.com/Pika-Software/http-content
 -- Libraries
 local promise = promise
 local string = string
+local cvars = cvars
 local http = http
 local util = util
 
 -- Variables
-local imgurID = CreateConVar( "imgur_clientid", "", bit.bor( FCVAR_ARCHIVE, FCVAR_PROTECTED ), "https://api.imgur.com/oauth2/addclient" )
+local select = select
 local assert = assert
 local type = type
 
+CreateConVar( "imgur_clientid", "", bit.bor( FCVAR_ARCHIVE, FCVAR_PROTECTED ), "https://api.imgur.com/oauth2/addclient" )
+
 module( "imgur" )
 
+do
+
+    local function clientIDChanged( str )
+        if #string.Trim( str ) == 0 then
+            HasClientID = false
+            ClientID = nil
+            return
+        end
+
+        HasClientID = true
+        ClientID = str
+    end
+
+    clientIDChanged( cvars.String( "imgur_clientid", "" ) )
+    cvars.AddChangeCallback( "imgur_clientid", function( _, __, value ) clientIDChanged( value ) end )
+
+end
+
+function GetImageID( str )
+    return string.match( str, "^https?://.*imgur%.com[/\\](%w+)[%./\\]?" ) or str
+end
+
 ImageInfo = promise.Async( function( imageID )
-    local clientID = imgurID:GetString()
-    assert( clientID ~= "", "no clientID" )
+    assert( HasClientID, "no clientID" )
 
-    imageID = string.match( imageID, "^https?://imgur%.com[/\\](%w+)[%./\\]?" ) or imageID
-
-    local ok, result = http.Fetch( "https://api.imgur.com/3/image/" .. imageID, {
-        ["Authorization"] = "Client-ID " .. clientID
+    local ok, result = http.Fetch( "https://api.imgur.com/3/image/" .. GetImageID( imageID ), {
+        ["Authorization"] = "Client-ID " .. ClientID
     } ):SafeAwait()
 
     if not ok then return promise.Reject( result ) end
-    if result.code ~= 200 then return promise.Reject( "invalid response http code - " .. result.code ) end
+
+    local code = result.code
+    if code ~= 200 then
+        return promise.Reject( select( -1, http.GetStatusDescription( code ) ) )
+    end
 
     local tbl = util.JSONToTable( result.body )
     if not tbl then return promise.Reject( "incorrect response" ) end
@@ -37,10 +63,11 @@ ImageInfo = promise.Async( function( imageID )
 end )
 
 Upload = promise.Async( function( binaryData, contentType, title, description, name, disableAudio, album )
-    local clientID = imgurID:GetString()
-    assert( clientID ~= "", "no clientID" )
+    assert( HasClientID, "no clientID" )
 
-    if string.IsURL( binaryData ) then contentType = "URL" end
+    if string.IsURL( binaryData ) then
+        contentType = "URL"
+    end
 
     local parameters = {
         ["description"] = type( description ) == "string" and description or nil,
@@ -63,11 +90,15 @@ Upload = promise.Async( function( binaryData, contentType, title, description, n
     end
 
     local ok, result = http.Post( "https://api.imgur.com/3/upload", parameters, {
-        ["Authorization"] = "Client-ID " .. clientID
+        ["Authorization"] = "Client-ID " .. ClientID
     } ):SafeAwait()
 
     if not ok then return promise.Reject( result ) end
-    if result.code ~= 200 then return promise.Reject( "invalid response http code - " .. result.code ) end
+
+    local code = result.code
+    if code ~= 200 then
+        return promise.Reject( select( -1, http.GetStatusDescription( code ) ) )
+    end
 
     local tbl = util.JSONToTable( result.body )
     if not tbl then return promise.Reject( "incorrect response" ) end
@@ -80,18 +111,52 @@ Upload = promise.Async( function( binaryData, contentType, title, description, n
 end )
 
 Download = promise.Async( function( imageID, allowNSFW )
-    local ok, result = ImageInfo( imageID ):SafeAwait()
-    if not ok then return promise.Reject( result ) end
+    if not HasClientID then
+        local extension = string.GetExtensionFromFilename( imageID )
+        if not extension then extension = "png" end
 
-    if result.nsfw and not allowNSFW then return promise.Reject( "nsfw content" ) end
+        imageID = GetImageID( imageID ) .. "." .. extension
+
+        local ok, result = http.DownloadImage( "https://i.imgur.com/" .. imageID ):SafeAwait()
+        if ok then return result end
+
+        ok, result = http.DownloadImage( "https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/" .. imageID ):SafeAwait()
+        if ok then return result end
+
+        return promise.Reject( result )
+    end
+
+    local ok, result = ImageInfo( imageID ):SafeAwait()
+    if not ok then
+        return promise.Reject( result )
+    end
+
+    if result.nsfw and not allowNSFW then
+        return promise.Reject( "nsfw content" )
+    end
 
     local ok, result = http.DownloadImage( result.link ):SafeAwait()
-    if not ok then return promise.Reject( result ) end
+    if ok then return result end
 
-    return result
+    return promise.Reject( result )
 end )
 
 Material = promise.Async( function( imageID, parameters, allowNSFW )
+    if not HasClientID then
+        local extension = string.GetExtensionFromFilename( imageID )
+        if not extension then extension = "png" end
+
+        imageID = GetImageID( imageID ) .. "." .. extension
+
+        local ok, result = http.DownloadMaterial( "https://i.imgur.com/" .. imageID, parameters ):SafeAwait()
+        if ok then return result end
+
+        ok, result = http.DownloadMaterial( "https://proxy.duckduckgo.com/iu/?u=https://i.imgur.com/" .. imageID, parameters ):SafeAwait()
+        if ok then return result end
+
+        return promise.Reject( result )
+    end
+
     local ok, result = ImageInfo( imageID ):SafeAwait()
     if not ok then return promise.Reject( result ) end
 
