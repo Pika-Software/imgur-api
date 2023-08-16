@@ -1,4 +1,4 @@
-install( "packages/http-content", "https://github.com/Pika-Software/http-content" )
+install( "packages/http-extensions.lua", "https://raw.githubusercontent.com/Pika-Software/http-extensions/main/lua/packages/http-extensions.lua" )
 
 -- Libraries
 local promise = promise
