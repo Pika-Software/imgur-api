@@ -135,7 +135,7 @@ Download = promise.Async( function( imageID, allowNSFW )
         return promise.Reject( "nsfw content" )
     end
 
-    local ok, result = http.DownloadImage( result.link ):SafeAwait()
+    ok, result = http.DownloadImage( result.link ):SafeAwait()
     if ok then return result end
 
     return promise.Reject( result )
@@ -162,7 +162,7 @@ Material = promise.Async( function( imageID, parameters, allowNSFW )
 
     if result.nsfw and not allowNSFW then return promise.Reject( "nsfw content" ) end
 
-    local ok, result = http.DownloadMaterial( result.link, parameters ):SafeAwait()
+    ok, result = http.DownloadMaterial( result.link, parameters ):SafeAwait()
     if not ok then return promise.Reject( result ) end
 
     return result
